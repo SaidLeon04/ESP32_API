@@ -24,7 +24,7 @@ async def obtener_LED(id: int):
     c.execute(f'SELECT * FROM iot WHERE id ={id};')
     response = []
     for row in c:
-        dispositivo = {"id":row[0],"dispositivo":row[1], "valor":row[2]}
+        dispositivo = {"valor":row[2]}
         # dispositivo = {"valor":row[0]}
         response.append(dispositivo)
         if response == 'null':
