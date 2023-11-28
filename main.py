@@ -33,7 +33,7 @@ async def obtener_LED(id: int):
             return response
 
 @app.put("/iot/{id}/{valor}")
-async def actualizar_LED(id: int, valor: int):
+async def actualizar_LED(id: int, valor: str):
     c = conn.cursor()
     c.execute('UPDATE iot SET valor = ? WHERE id = ?;', (valor,id))
     conn.commit()
