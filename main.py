@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/iot/")
+@app.get("/iot")
 async def obtener_todos():
     c = conn.cursor()
     c.execute('SELECT * FROM iot;')
