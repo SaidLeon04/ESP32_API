@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP_32</title>
+    <script type="text/javascript" src="../static/js/on_off.js"></script>
+    <script type="text/javascript" src="../static/js/get_data.js"></script>
+</head>
+<body onload="get_data()">
+    <label for="valor">ON/OFF</label>
+    <input type="number" name="valor" id="valor">
+    <button onclick="on_off(document.getElementById('valor').value)">Enviar</button>
+</body>
+</html>
