@@ -11,9 +11,9 @@ function get_led(){
         console.log("json: " + json);
         console.log("status_code: " + request.status);
         for (var i = 0; i < Object.keys(json).length; i++) {
-            console.log(i)
-    
-           
+            var header = document.getElementById("h4");
+            header.innerHTML = json[i]["id"]
+           h4.appendChild(header);
         }
     }
     

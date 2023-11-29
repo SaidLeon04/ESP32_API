@@ -16,16 +16,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.get("/iot")
-async def obtener_todos():
-    c = conn.cursor()
-    c.execute('SELECT * FROM iot;')
-    response = []
-    for row in c:
-        dispositivo = {"id":row[0],"dispositivo":row[1],"valor":row[2]}
-        response.append(dispositivo)
-    return response
         
 @app.get("/iot/{id}")
 async def obtener_LED(id: int):
