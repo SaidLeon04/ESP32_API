@@ -25,10 +25,7 @@ async def obtener_todos():
     for row in c:
         dispositivo = {"id":row[0],"dispositivo":row[1],"valor":row[2]}
         response.append(dispositivo)
-        if response == 'null':
-            raise fastapi.HTTPException(status_code=404, detail="-1")
-        else: 
-            return response
+    return response
         
 @app.get("/iot/{id}")
 async def obtener_LED(id: int):
