@@ -20,12 +20,10 @@ app.add_middleware(
 @app.get("/iot/{id}")
 async def obtener_LED(id: int):
     c = conn.cursor()
-    # c.execute('SELECT valor FROM iot;')
     c.execute(f'SELECT * FROM iot WHERE id ={id};')
     response = []
     for row in c:
         dispositivo = {"valor":row[2]}
-        # dispositivo = {"valor":row[0]}
         response.append(dispositivo)
         if response == 'null':
             raise fastapi.HTTPException(status_code=404, detail="-1")
@@ -37,4 +35,8 @@ async def actualizar_LED(id: int, valor: str):
     c = conn.cursor()
     c.execute('UPDATE iot SET valor = ? WHERE id = ?;', (valor,id))
     conn.commit()
-    return {"mensaje":"Dispositivo actualizado"}
+    response = {"mensaje":"Dispositivo actualizado"}
+    if response == 'null':
+        raise fastapi.HTTPException(status_code=404, detail="-1")
+    else:
+        return response
