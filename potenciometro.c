@@ -4,53 +4,41 @@
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
-int pinPotenciometro = 13;
-int ledPin = 14;
 
-// URL de la API en Heroku
-String serverName = "https://esp32-api-2b745173c4b8.herokuapp.com/iot";
+int pinPotenciometro = 34;
+
+String serverName = "https://esp32api-43c01-default-rtdb.firebaseio.com/iot/2/valor.json";
 
 unsigned long lastTime = 0;
-unsigned long timerDelay = 500;
+unsigned long timerDelay = 100;
 int lastValorPotenciometro = -1;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(ledPin, OUTPUT);
-
-  // Conectar a la red WiFi
   WiFi.begin(ssid, password);
-  Serial.println("Conectando");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(100);
-    Serial.print(".");
-  }
+  Serial.println("Conectado");
 }
 
 void loop() {
-  // Leer el valor del potenciómetro
   int valorPotenciometro = analogRead(pinPotenciometro);
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
+    String valorPotStr = String(valorPotenciometro);
 
-    String serverPath = serverName + "/5/" + String(valorPotenciometro);
+    http.begin(serverName.c_str());
 
-    // Iniciar la conexión HTTP para el potenciómetro
-    http.begin(serverPath.c_str());
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+    int httpResponseCodePotenciometro = http.PUT(valorPotStr);
 
-    // Enviar una solicitud HTTP PUT con el valor del potenciómetro
-    int httpResponseCode = http.PUT("");
-
-    if (httpResponseCode > 0) {
-      Serial.println(httpResponseCode);
+    if (httpResponseCodePotenciometro > 0) {
+      Serial.println(httpResponseCodePotenciometro);
+      Serial.print("Valor: ");
       Serial.println(valorPotenciometro);
     } else {
-      Serial.print("Código de error (Potenciómetro): ");
-      Serial.println(httpResponseCode);
+      Serial.println(httpResponseCodePotenciometro);
     }
     http.end();
   }
-}
 
+  delay(timerDelay);
+}

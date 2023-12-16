@@ -1,63 +1,59 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include "cJSON.h"
 
+const char* ssid = "Wokwi-GUEST";
+const char* password = "";
 
-#define WIFI_SSID "Wokwi-GUEST" // Red
-#define WIFI_PASSWORD "" // Contraseña
-void setup(){ // funcion de configuracion inicial
-  Serial.begin(115200);  // velocidad de trasmision en baudios
-  pinMode(2, OUTPUT); // configuracion del LED
-  
-  Serial.print("Conectando a: ");
-  Serial.println(WIFI_SSID);
+const int ledPin = 13; // Pin para controlar el LED
 
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD); // conexion
-  // mientras el estado no sea conectado
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000); 
-    Serial.print("."); // imprime puntos cada segundo
-  }
-  // Impresión de estado de conexión
-  if (WiFi.status() == WL_CONNECTED) { 
-    Serial.println("\nConexión exitosa");
-  } else {
-    Serial.println("\nError al conectar a la red WiFi");
+String serverName = "https://esp32api-43c01-default-rtdb.firebaseio.com/iot/1/valor.json"; // Cambia esto por tu URL de la base de datos
+
+unsigned long lastTime = 0;
+unsigned long timerDelay = 100; // Intervalo de tiempo para consultar el estado en milisegundos (10 segundos)
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(ledPin, OUTPUT);
+
+  WiFi.begin(ssid, password);
+  Serial.println("Conectando a WiFi...");
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(100);
+    Serial.print(".");
   }
 }
-void loop(){
-  HTTPClient http;
-  const char *url = "https://esp32-api-2b745173c4b8.herokuapp.com/iot/1";
-  
-  // Enviar solicitud GET
-  http.begin(url);
-  int httpResponseCode = http.GET();
-  
-  // Manejo de respuesta
-  if (httpResponseCode > 0) {
-    String payload = http.getString();
-    Serial.println("Respuesta de la API:");
-    Serial.println(payload);
-    //int index = payload.indexOf("\"valor\":\"0\"");
-    int index = payload.indexOf("\"valor\":1");
-    if (index != -1) {
-      Serial.println("El valor de \"valor\" es 1");
-      Serial.println("Encendiendo LED");
-      digitalWrite(2, HIGH);
 
-    }else{
-      index = payload.indexOf("\"valor\":0");
-      if (index != -1) {
-        Serial.println("El valor de \"valor\" es 0");
-        Serial.println("Apagando LED");
-        digitalWrite(2, LOW);
-      } 
+void loop() {
+  if ((millis() - lastTime) > timerDelay) {
+    if(WiFi.status() == WL_CONNECTED){
+      HTTPClient http;
+
+      http.begin(serverName.c_str());
+      int httpResponseCode = http.GET();
+
+      if (httpResponseCode > 0) {
+        String payload = http.getString();
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+        Serial.print("Payload: ");
+        Serial.println(payload);
+
+        // Verificar si el valor es "0" en el payload
+        if (payload.equals("1")) {
+          digitalWrite(ledPin, HIGH); // Enciende el LED si el valor es "1"
+          Serial.println("LED encendido");
+        } else {
+          digitalWrite(ledPin, LOW); // Apaga el LED si el valor no es "1"
+          Serial.println("LED apagado");
+        }
+      } else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end();
+    } else {
+      Serial.println("WiFi Desconectado");
     }
-  } else {
-    Serial.print("Error en la solicitud. Código de error: ");
-    Serial.println(httpResponseCode);
+    lastTime = millis();
   }
-  http.end();
-  delay(10);
 }
-
